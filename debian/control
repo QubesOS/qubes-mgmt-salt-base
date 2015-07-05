@@ -1,0 +1,19 @@
+Source: qubes-mgmt-salt-base
+Section: admin
+Priority: extra
+Maintainer: Jason Mehring <nrgaway@gmail.com>
+Build-Depends: debhelper (>= 9~), quilt
+Standards-Version: 3.9.5
+Homepage: http://www.qubes-os.org
+
+Package: qubes-mgmt-salt-base
+Section: admin
+Architecture: all
+Depends:
+    qubes-mgmt-salt-config,
+    qubes-mgmt-salt-base-salt,
+    qubes-mgmt-salt-base-overrides,
+    qubes-mgmt-salt-base-yamlscript-renderer,
+    qubes-mgmt-salt-base-yamlscript-users,
+    qubes-mgmt-salt-base-gpg
+Description: Custom base modules and states that are shared between dom0 and VM.
