@@ -13,7 +13,7 @@ Misc Utility Functions
 '''
 
 # Import python libs
-import sys
+import argparse
 import types
 import collections
 import logging
@@ -21,37 +21,13 @@ import logging
 from inspect import stack
 
 # Salt libs
-import salt.config
-import salt.loader
-import salt.pillar
 import salt.utils
-from salt.exceptions import (
-    CommandExecutionError, SaltInvocationError
-)
-
-# Third party libs
-from options import Options
 
 # Enable logging
 log = logging.getLogger(__name__)
 
-## Set salt pillar, grains and opts settings so they can be applied to modules
-##
-##__opts__ = salt.config.minion_config('/etc/salt/minion')
-##__opts__['grains'] = salt.loader.grains(__opts__)
-##pillar = salt.pillar.get_pillar(
-##    __opts__,
-##    __opts__['grains'],
-##    __opts__['id'],
-##    __opts__['environment'],
-##)
-##__opts__['pillar'] = pillar.compile_pillar()
-##__salt__ = salt.loader.minion_mods(__opts__)
-##__grains__ = __opts__['grains']
-##__pillar__ = __opts__['pillar']
 
-
-class Status(Options):
+class Status(argparse.Namespace):
     def __init__(self, *args, **kwargs):
         defaults = {
             'name':  '',
@@ -62,10 +38,13 @@ class Status(Options):
             'data':  None,
             'changes': {},
             'comment': '',
-        }
+            'prefix': '',
+            'message': '',
+            'error_message': '',
+            }
 
         defaults.update(kwargs)
-        super(Status, self).__init__(*args, **defaults)
+        super(Status, self).__init__(**defaults)
 
     def __len__(self):
         return self.passed()
@@ -95,7 +74,7 @@ class Status(Options):
         args = ['name', 'retcode', 'result', 'data', 'prefix', 'message', 'error_message']
         for arg in args:
             if arg not in self or locals().get(arg, None):
-                self[arg] = locals()[arg]
+                setattr(self, arg, locals()[arg])
 
         if not self.comment:
             # ------------------------------------------------------------------
@@ -208,7 +187,7 @@ class Status(Options):
 
             # 'changes' - Merge changes
             if status.changes and status.passed():
-                name = status.get('name', '')  # or self.__virtualname__
+                name = getattr(status, 'name', '')  # or self.__virtualname__
                 changes.setdefault(name, {})
                 for key, value in status.changes.items():
                     changes[name][key] = value
@@ -225,12 +204,10 @@ class Status(Options):
                 stderr  = status.stdout,
             )
 
-        # XXX: Could now just update self and return self, but may need to
-        #      make sure attrs are cleared first?
         return Status(
             name    = status.name,
             retcode = retcode,
-            result = status.result,
+            result  = status.result,
             comment = comment,
             stdout  = status.stdout,
             stderr  = status.stdout,

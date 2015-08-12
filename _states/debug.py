@@ -35,7 +35,7 @@ def _state_action(_action, *varargs, **kwargs):
         status = __salt__[_action](*varargs, **kwargs)
     except (SaltInvocationError, CommandExecutionError), e:
         status = Status(retcode=1, stderr=e.message + '\n')
-    return dict(status)
+    return vars(status)
 
 
 def mode(name, *varargs, **kwargs):

@@ -36,7 +36,7 @@ def _state_action(_action, *varargs, **kwargs):
         status = __salt__[_action](*varargs, **kwargs)
     except (SaltInvocationError, CommandExecutionError), e:
         status = Status(retcode=1, result=False, comment=e.message + '\n')
-    return dict(status)
+    return vars(status)
 
 
 def create(name, comment, result=None):
