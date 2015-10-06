@@ -1,0 +1,37 @@
+# -*- coding: utf-8 -*-
+# vim: set syntax=yaml ts=2 sw=2 sts=2 et :
+
+salt:
+  install_packages: True
+  clean_config_d_dir: False
+
+  config_path: /etc/salt
+
+  minion_service: salt-minion
+  master_service: salt-master
+  api_service: salt-api
+  syndic_service: salt-syndic
+
+  salt_master: salt-master
+  salt_minion: salt-minion
+  salt_syndic: salt-syndic
+  salt_cloud: salt-cloud
+  salt_api: salt-api
+  salt_ssh: salt-ssh
+
+  master:
+    gitfs_provider: gitpython
+
+  gitfs:
+    dulwich:
+      install_from_source: True
+    pygit2:
+      install_from_source: True
+    gitpython:
+      install_from_source: False
+
+  cloud:
+    template_sources:
+      providers: salt://salt/files/cloud.providers.d
+      profiles: salt://salt/files/cloud.profiles.d
+      maps: salt://salt/files/cloud.maps.d
