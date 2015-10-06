@@ -215,7 +215,7 @@ class Status(argparse.Namespace):
         )
 
 
-def tostring(value):
+def coerce_to_string(value):
     '''Convert value to string when possible (for argparse)
     '''
     if value is None:
@@ -228,7 +228,7 @@ def tostring(value):
     return value
 
 
-def tolist(value):
+def coerce_to_list(value):
     '''Converts value to a list.
     '''
     if not value:

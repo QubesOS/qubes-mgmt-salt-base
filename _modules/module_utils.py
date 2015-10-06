@@ -30,7 +30,7 @@ from salt.exceptions import (
 
 # Salt + Qubes libs
 from qubes_utils import (
-    Status, tostring, tolist
+    Status, coerce_to_string, coerce_to_list
 )
 
 # Enable logging
@@ -103,7 +103,7 @@ class ModuleBase(object):
         self.defaults.run_post_hook = kwargs.pop('run-post-hook', None)
 
         # Type of status mode to use (default: last)
-        self.defaults.status_mode = tolist(kwargs.pop('status-mode', 'last'))
+        self.defaults.status_mode = coerce_to_list(kwargs.pop('status-mode', 'last'))
         if not set(['last', 'all']).intersection(self.defaults.status_mode):
             self.defaults.status_mode.append('last')
 
@@ -358,9 +358,9 @@ class ArgumentParser(argparse.ArgumentParser):
             # varargs
             if positional:
                 if key:
-                    add(dest, tostring(value))
+                    add(dest, coerce_to_string(value))
                 elif varargs and varargs_index < len(varargs):
-                    add(dest, tostring(varargs[varargs_index]))
+                    add(dest, coerce_to_string(varargs[varargs_index]))
                     varargs_index += 1
 
             # kwargs
@@ -390,7 +390,7 @@ class ArgumentParser(argparse.ArgumentParser):
                 elif isinstance(value, types.FunctionType):
                     add(dest, ArgparseFunctionWrapper(value))
                 else:
-                    add(dest, tostring(value))
+                    add(dest, coerce_to_string(value))
 
         # XXX: Just return argv
         return info
