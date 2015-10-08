@@ -27,7 +27,7 @@ URL:	   http://www.qubes-os.org/
 Group:     System administration tools
 BuildArch: noarch
 Requires:  qubes-mgmt-salt-config
-Requires:  qubes-mgmt-salt-base-topd
+Requires:  qubes-mgmt-salt-base-config
 Requires:  qubes-mgmt-salt-base-overrides
 
 %define _builddir %(pwd)
