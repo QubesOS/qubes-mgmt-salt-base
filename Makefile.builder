@@ -1,23 +1,26 @@
+# vim: filetype=make
+
 ifndef LOADING_PLUGINS
+    SOURCE_COPY_IN := source-mgmt-salt-base-copy-in
+    _rpm_spec_files := rpm_spec/qubes-mgmt-salt-base.spec
+    
     ifeq ($(PACKAGE_SET),dom0)
-        RPM_SPEC_FILES := rpm_spec/qubes-mgmt-salt-base.spec
-        RPM_BUILD_DEFINES += --define "_verbose $(VERBOSE)"
+            RPM_SPEC_FILES := $(_rpm_spec_files)
 
     else ifeq ($(PACKAGE_SET),vm)
         ifneq ($(filter $(DISTRIBUTION), debian qubuntu),)
             DEBIAN_BUILD_DIRS := debian
-            SOURCE_COPY_IN := source-debian-mgmt-salt-base-copy-in
+	else
+            RPM_SPEC_FILES := $(_rpm_spec_files)
         endif
-
-        RPM_SPEC_FILES := rpm_spec/qubes-mgmt-salt-base.spec
-        RPM_BUILD_DEFINES += --define "_verbose $(VERBOSE)"
     endif
-
-    source-debian-mgmt-salt-base-copy-in: VERSION = $(shell $(DEBIAN_PARSER) changelog --package-version $(ORIG_SRC)/$(DEBIAN_BUILD_DIRS)/changelog)
-    source-debian-mgmt-salt-base-copy-in: NAME = $(shell $(DEBIAN_PARSER) changelog --package-name $(ORIG_SRC)/$(DEBIAN_BUILD_DIRS)/changelog)
-    source-debian-mgmt-salt-base-copy-in: ORIG_FILE = "$(CHROOT_DIR)/$(DIST_SRC)/../$(NAME)_$(VERSION).orig.tar.gz"
-    source-debian-mgmt-salt-base-copy-in:
-	 -$(shell $(ORIG_SRC)/debian-quilt $(ORIG_SRC)/series-debian-vm.conf $(CHROOT_DIR)/$(DIST_SRC)/debian/patches)
-	 tar cfz $(ORIG_FILE) --exclude-vcs --exclude=./rpm --exclude=./pkgs --exclude=./deb --exclude=./debian -C $(CHROOT_DIR)/$(DIST_SRC) .
 endif
-# vim: filetype=make
+
+# mgmt-salt's Makefile.builder will copy a shared Makefile.install to the
+# chroot environment and parse and dump the yaml FORMULA configuration
+# file to Makefile.vars in the chroot environment as well.
+#
+# mgmt-salt also contains the shared copy-in function
+source-mgmt-salt-base-copy-in:
+	@$(call MGMT_INSTALL_MAKEFILES) 
+	@$(call MGMT_COPY_IN)
