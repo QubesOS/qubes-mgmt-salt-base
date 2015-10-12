@@ -2,7 +2,9 @@ Source: qubes-mgmt-salt-base
 Section: admin
 Priority: extra
 Maintainer: Jason Mehring <nrgaway@gmail.com>
-Build-Depends: debhelper (>= 9~), quilt
+Build-Depends:
+    debhelper (>= 9~),
+    quilt
 Standards-Version: 3.9.5
 Homepage: http://www.qubes-os.org
 

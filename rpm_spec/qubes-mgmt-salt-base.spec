@@ -42,17 +42,28 @@ make install DESTDIR=%{buildroot} LIBDIR=%{_libdir} BINDIR=%{_bindir} SBINDIR=%{
 
 %post
 # Update Salt Configuration
-qubesctl state.sls qubes.config -l quiet --out quiet > /dev/null || true
-qubesctl saltutil.sync_all -l quiet --out quiet > /dev/null || true
-
-# Enable States
-qubesctl topd.enable %{state_name}.config saltenv=%{saltenv} -l quiet --out quiet > /dev/null || true
-qubesctl topd.enable %{state_name}.directories saltenv=%{saltenv} -l quiet --out quiet > /dev/null || true
-qubesctl topd.enable %{state_name}.user-dirs saltenv=%{saltenv} -l quiet --out quiet > /dev/null || true
+qubesctl state.sls config -l quiet --out quiet > /dev/null || true
+qubesctl saltutil.clear_cache -l quiet --out quiet > /dev/null || true
+qubesctl saltutil.sync_all refresh=true -l quiet --out quiet > /dev/null || true
 
 %files
 %defattr(-,root,root)
-%attr(750, root, root) %dir %{formula_dir}
-%{formula_dir}/*
+%attr(750, root, root) %dir /srv/salt/_grains
+/srv/salt/_grains/redfined_dom0_grains.py*
+/srv/salt/_grains/whonix.py*
+
+%attr(750, root, root) %dir /srv/salt/_modules
+/srv/salt/_modules/debug.py*
+/srv/salt/_modules/module_utils.py*
+/srv/salt/_modules/qubes.py*
+
+%attr(750, root, root) %dir /srv/salt/_states
+/srv/salt/_states/debug.py*
+/srv/salt/_states/status.py*
+
+%attr(750, root, root) %dir /srv/salt/_utils
+/srv/salt/_utils/__init__.py*
+/srv/salt/_utils/nulltype.py*
+/srv/salt/_utils/qubes_utils.py*
 
 %changelog
