@@ -1,26 +1,18 @@
 # vim: filetype=make
 
 ifndef LOADING_PLUGINS
-    SOURCE_COPY_IN := source-mgmt-salt-base-copy-in
-    _rpm_spec_files := rpm_spec/qubes-mgmt-salt-base.spec
-    
+    SOURCE_COPY_IN := mgmt-salt-copy-in
     ifeq ($(PACKAGE_SET),dom0)
-            RPM_SPEC_FILES := $(_rpm_spec_files)
-
+        ifneq ($(filter $(DISTRIBUTION), debian qubuntu),)
+            DEBIAN_BUILD_DIRS := $(call get-mgmt-debian-dir)
+        else
+            RPM_SPEC_FILES := $(call get-mgmt-rpm-spec)
+        endif
     else ifeq ($(PACKAGE_SET),vm)
         ifneq ($(filter $(DISTRIBUTION), debian qubuntu),)
-            DEBIAN_BUILD_DIRS := debian
-	else
-            RPM_SPEC_FILES := $(_rpm_spec_files)
+            DEBIAN_BUILD_DIRS := $(call get-mgmt-debian-dir)
+        else
+            RPM_SPEC_FILES := $(call get-mgmt-rpm-spec)
         endif
     endif
 endif
-
-# mgmt-salt's Makefile.builder will copy a shared Makefile.install to the
-# chroot environment and parse and dump the yaml FORMULA configuration
-# file to Makefile.vars in the chroot environment as well.
-#
-# mgmt-salt also contains the shared copy-in function
-source-mgmt-salt-base-copy-in:
-	@$(call MGMT_INSTALL_MAKEFILES) 
-	@$(call MGMT_COPY_IN)
