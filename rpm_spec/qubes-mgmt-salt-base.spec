@@ -50,6 +50,7 @@ qubesctl saltutil.sync_all refresh=true -l quiet --out quiet > /dev/null || true
 
 %files
 %defattr(-,root,root)
+%doc LICENSE README.rst
 %attr(750, root, root) %dir /srv/salt/_grains
 /srv/salt/_grains/redefined_dom0_grains.py*
 /srv/salt/_grains/whonix.py*
