@@ -1,9 +1,8 @@
 %{!?version: %define version %(cat version)}
-%{!?rel: %define rel %(cat rel)}
 
 Name:      qubes-mgmt-salt-base
 Version:   %{version}
-Release:   %{rel}%{?dist}
+Release:   1%{?dist}
 summary:   Custom base modules and states that are shared between dom0 and VM.
 License:   GPL 2.0
 URL:	   http://www.qubes-os.org/
