@@ -44,6 +44,7 @@ qubesctl saltutil.sync_all refresh=true -l quiet --out quiet > /dev/null || true
 %attr(750, root, root) %dir /srv/salt/_grains
 /srv/salt/_grains/redefined_dom0_grains.py*
 /srv/salt/_grains/whonix.py*
+/srv/salt/_grains/pci_devs.py*
 
 %attr(750, root, root) %dir /srv/salt/_modules
 /srv/salt/_modules/debug.py*
