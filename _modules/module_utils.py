@@ -34,6 +34,8 @@ from qubes_utils import (
 )
 
 # Enable logging
+import grp
+
 log = logging.getLogger(__name__)
 
 # Used to identify values that have not been passed to functions which allows
@@ -119,6 +121,12 @@ class ModuleBase(object):
         self.argparser.add_argument_group('salt')
         self.parser = self.argparser.get_argument_group('salt')
 
+        # User to run commands as
+        qubes_group = grp.getgrnam('qubes')
+        if not len(qubes_group.gr_mem):
+            raise SaltInvocationError("Group 'qubes' has no members")
+        self.run_as_user = qubes_group.gr_mem[0]
+
     def parse_args(self, *varargs, **kwargs):
         self.args = self.argparser.parse_salt_args(*varargs, **kwargs)
         return self.args
@@ -152,7 +160,8 @@ class ModuleBase(object):
             if isinstance(cmd, list):
                 cmd = ' '.join(cmd)
 
-            status = Status(**__salt__['cmd.run_all'](cmd, runas='user', output_loglevel='quiet', **options))
+            status = Status(**__salt__['cmd.run_all'](
+                cmd, runas=self.run_as_user, output_loglevel='quiet', **options))
             delattr(status, 'pid')
 
         self._run_post_hook(post_hook, cmd, status, data)
