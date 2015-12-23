@@ -18,6 +18,7 @@ def pci_devs():
     '''
     Useful PCI devices lists.
     '''
+
     def find_devices_of_class(klass):
         lspci = salt.utils.which('lspci')
 
@@ -30,8 +31,9 @@ def pci_devs():
                 print "ERROR when executing lspci!"
                 raise IOError
 
-            rx_netdev = re.compile(r"^([0-9a-f]{2}:[0-9a-f]{2}.[0-9a-f]) \"" +
-                                   klass)
+            rx_netdev = re.compile(
+                r"^([0-9a-f]{2}:[0-9a-f]{2}.[0-9a-f]) \"" + klass
+            )
 
             for dev in str(result[0]).splitlines():
                 match = rx_netdev.match(dev)
@@ -46,4 +48,3 @@ def pci_devs():
     }
 
     return grains
-
