@@ -14,10 +14,9 @@ def whonix():
     Redefine whonix grains.
     '''
     grains = {}
-    if salt.grains.core.os_data()['os'] == 'Whonix': 
+    if salt.grains.core.os_data()['os'] == 'Whonix':
         grains = {}
         grains['virtual'] = 'Qubes+Whonix'
         grains['os'] = 'Debian'
         grains['os_family'] = 'Debian'
     return grains
-
