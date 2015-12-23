@@ -12,22 +12,21 @@ Module Utilities
 ================
 '''
 
+from __future__ import absolute_import
+
 # Import python libs
 import types
-import copy
-import argparse
+import argparse  # pylint: disable=E0598
 import logging
-import collections
-
-from inspect import getargvalues, stack
 
 # Salt libs
-import salt.config
-import salt.loader
 from salt.exceptions import (CommandExecutionError, SaltInvocationError)
 
 # Salt + Qubes libs
-from qubes_utils import (Status, coerce_to_string, coerce_to_list)
+# pylint: disable=E0401
+from qubes_utils import (
+    Status, coerce_to_string, coerce_to_list
+)
 
 # Enable logging
 import grp
@@ -36,7 +35,7 @@ log = logging.getLogger(__name__)
 
 # Used to identify values that have not been passed to functions which allows
 # the function modules not to have to know anything about the default types
-# excpected
+# expected
 try:
     if MARKER:
         pass
@@ -50,12 +49,13 @@ except NameError:
 
 
 class ArgparseFunctionWrapper(object):
-    '''Wraps functions to appear as string.
+    '''
+    Wraps functions to appear as string.
 
-    Argparse only alllows file, str or int types so to be able to use argparse
-    to parse other types, they can be wrapped and will appear as 'None'
+    Argparse only allows file, str or int types so to be able to use argparse
+    to parse other types, they can be wrapped and will appear as 'None'.
 
-    Function is still callable
+    Function is still callable.
     '''
 
     def __init__(self, func):
@@ -69,8 +69,9 @@ class ArgparseFunctionWrapper(object):
 
 
 class ModuleBase(object):
-    '''ModuleBase is a base class which contains base functionality and utility
-       to implement the qvm-* commands
+    '''
+    ModuleBase is a base class which contains base functionality and utility
+    to implement the qvm-* commands.
     '''
 
     def _set_debug_mode(self, args):
@@ -80,13 +81,17 @@ class ModuleBase(object):
             if args.debug_mode:
                 if 'debug' not in args.status_mode:
                     args.status_mode.append('debug')
+
                 if self.__virtualname__ not in __context__['debug']:
                     __context__['debug'].append(self.__virtualname__)
+
             else:
                 if 'debug' in args.status_mode:
                     args.status_mode.remove('debug')
+
                 if self.__virtualname__ in __context__['debug']:
                     __context__['debug'].remove(self.__virtualname__)
+
         elif self.__virtualname__ in __context__[
             'debug'
         ] or '__all__' in __context__['debug']:
@@ -112,7 +117,11 @@ class ModuleBase(object):
                 'status-mode', 'last'
             )
         )
-        if not set(['last', 'all']).intersection(self.defaults.status_mode):
+
+        # pylint: disable=E0598
+        if not {
+            'last', 'all'
+        }.intersection(self.defaults.status_mode):
             self.defaults.status_mode.append('last')
 
         # Determine if called via CLI
@@ -129,8 +138,10 @@ class ModuleBase(object):
 
         # User to run commands as
         qubes_group = grp.getgrnam('qubes')
+
         if not len(qubes_group.gr_mem):
             raise SaltInvocationError("Group 'qubes' has no members")
+
         self.run_as_user = qubes_group.gr_mem[0]
 
     def parse_args(self, *varargs, **kwargs):
@@ -147,9 +158,18 @@ class ModuleBase(object):
         message='',
         error_message=''
     ):
-        '''Merges data from individual status into master data dictionary
+        '''
+        Merges data from individual status into master data dictionary
         which will be returned and includes all changes and comments as well
-        as the overall status status
+        as the overall status status.
+
+        :param status:
+        :param retcode:
+        :param result:
+        :param data:
+        :param prefix:
+        :param message:
+        :param error_message:
         '''
         # Create a default status if one does not exist
         if status is None:
@@ -158,6 +178,7 @@ class ModuleBase(object):
         if not status.name:
             status.name = self.__virtualname__
 
+        # pylint: disable=W0212
         status._format(
             retcode=retcode,
             result=result,
@@ -178,13 +199,20 @@ class ModuleBase(object):
         data=None,
         **options
     ):
-        '''Executes cmd using salt.utils run_all function.
+        '''
+        Executes cmd using salt.utils run_all function.
 
         Fake status are returned instead of executing the command if test
         mode is enabled.
+
+        :param cmd:
+        :param test_ignore:
+        :param post_hook:
+        :param data:
         '''
         if __opts__['test'] and not test_ignore:
             status = Status(retcode=0, prefix='[TEST] ')
+
         else:
             if isinstance(cmd, list):
                 cmd = ' '.join(cmd)
@@ -207,19 +235,24 @@ class ModuleBase(object):
         return self.save_status(status, message=cmd_string)
 
     def _run_post_hook(self, post_hook, cmd, status, data):
-        '''Execute and post hooks if they exist.
+        '''
+        Execute and post hooks if they exist.
         '''
         if post_hook:
             post_hook(cmd, status, data)
+
         if self.defaults.run_post_hook:
             self.defaults.run_post_hook(cmd, status, data)
 
     def status(self):
-        '''Returns finalized merged 'data' status.
+        '''
+        Returns finalized merged 'data' status.
         '''
         status = Status()
         status_mode = 'last' if 'last' in self.defaults.status_mode else 'all'
         debug_mode = True if 'debug' in self.defaults.status_mode else False
+
+        # pylint: disable=W0212
         return status._finalize(
             data=self._data,
             status_mode=status_mode,
@@ -245,31 +278,21 @@ class ArgumentParser(argparse.ArgumentParser):
         )
 
     def error(self, message):
-        """error(message: string)
+        '''
+        error(message: string)
 
         Raises a Salt CommandExecutionError.
 
         If you override this in a subclass, it should not return -- it
         should either exit or raise an exception.
-        """
-        #self.print_usage(_sys.stderr)
+
+        :param message:
+        '''
         raise CommandExecutionError(
             '{0}: error: {1}\n'.format(
                 self.prog, message
             )
         )
-
-    # XXX: Try Marek's version
-    #@staticmethod
-    #def find_key(adict, text):
-    #    '''
-    #    Attempt to find a key in dictionary that may have the format of
-    #    'this-is-a-key', compared to 'this_is_a_key'.
-    #    '''
-    #    for key in adict.keys():
-    #        if key.replace('-', '_') == text:
-    #            return key
-    #    return None
 
     def get_argument_group(self, group):
         for action_group in self._action_groups:
@@ -282,6 +305,7 @@ class ArgumentParser(argparse.ArgumentParser):
             'namespace', None
         ) is not None:
             namespace = self.options['namespace']
+
         return super(ArgumentParser, self).parse_args(
             args=args,
             namespace=namespace
@@ -292,6 +316,7 @@ class ArgumentParser(argparse.ArgumentParser):
             'namespace', None
         ) is not None:
             namespace = self.options['namespace']
+
         return super(ArgumentParser, self).parse_known_args(
             args=args,
             namespace=namespace
@@ -300,46 +325,57 @@ class ArgumentParser(argparse.ArgumentParser):
     def parse_salt_args(self, *varargs, **kwargs):
         arg_info = self.create_argv_list('salt', *varargs, **kwargs)
         args = self.parse_args(args=arg_info['__argv'])
-        args._arg_info = arg_info
-
-        args._argv = arg_info['__argv_hidden'] or arg_info['__argv']
+        args._arg_info = arg_info  # pylint: disable=W0212
+        # pylint: disable=W0212
+        args._argv = arg_info['__argv_hidden'] or arg_info[
+            '__argv'
+        ]
         return args
 
     def get_argument_group_keys(self, group, adict=None, first_only=True):
         '''
-        first_only: Include only first result
+
+        :param group:
+        :param adict:
+
+        :param first_only:
+            Include only first result.
         '''
         keys = []
         group = self.get_argument_group(group)
-        for action in group._group_actions:
+        for action in group._group_actions:  # pylint: disable=W0212
             if adict:
                 key = self.get_action_key(action, adict)
                 if key:
                     keys.append(key)
+
             else:
                 for option_string in action.option_strings:
                     keys.append(option_string.lstrip('-'))
+
                     if first_only:
                         break
+
         return keys
 
-    def get_action_key(self, action, adict):
+    @staticmethod
+    def get_action_key(action, adict):
         if action.option_strings:
             for option_string in action.option_strings:
                 if option_string.lstrip('-') in adict:
                     return option_string.lstrip('-')
-        #for key in adict:
-        #    if key.replace('-', '_') == action.dest:
-        #        return key
+
         elif action.dest in adict:
             return action.dest
+
         elif action.dest.replace('_', '-') in adict:
             return action.dest.replace('_', '-')
+
         return None
 
     def create_argv_list(self, _group, *varargs, **kwargs):
         '''
-        Hopefully we can send (vmname, varargs, kwargs)
+        Hopefully we can send (vmname, varargs, kwargs).
 
         Think best think to do is send parser (default, salt, keywords) with
         varargs and  kwargs; parse on that.
@@ -348,15 +384,13 @@ class ArgumentParser(argparse.ArgumentParser):
         var set.
 
         Maybe use DictDiffer if we need to remove items, like defaults...
+
+        :param _group:
         '''
-        # XXX: Temp
         group = _group
         hide = self.options.get('hide', []) or None
         keyword_flag_keys = self.options.get('flags', {})
-        #argv_ordering = self.options.get('argv_ordering', [])
-        #skip = self.options.get('skip', [])
 
-        #locals_ = info.pop('locals', {})
         info = {}
         info['__args'] = None
         info['__varargs'] = varargs
@@ -370,50 +404,32 @@ class ArgumentParser(argparse.ArgumentParser):
         info['__argv'] = []
         info['__argv_hidden'] = []
 
-        argv = []
-        positional_arguments = self.get_argument_group('positional arguments')
-        optional_arguments = self.get_argument_group('optional arguments')
-
         def add(dest, value):
             if value and isinstance(value, list):
                 info['__argv'].extend(value)
+
                 if hide is not None and dest not in hide:
                     info['__argv_hidden'].extend(value)
             else:
                 info['__argv'].append(value)
+
                 if hide is not None and dest not in hide:
                     info['__argv_hidden'].append(value)
 
-        #def get_arg_name(action):
-        #    names = set()
-        #    if action.option_strings:
-        #        for option_string in action.option_strings:
-        #            names.add(option_string.lstrip('-'))
-        #    else:
-        #        names.add(action.dest.replace('_', '-'))
-        #    return list(names)
-
-        #positionals = []
-        #for action in self.get_argument_group('positional arguments')._group_actions:
-        #    args = get_arg_name(action)
-        #    positionals.extend(args)
-
-        #optionals = []
-        #for action in self.get_argument_group('optional arguments')._group_actions:
-        #    args = get_arg_name(action)
-        #    optionals.extend(args)
-
         group = self.get_argument_group(group)
         varargs_index = 0
-        for action in group._group_actions:
+
+        for action in group._group_actions:  # pylint: disable=W0212
             dest = action.dest
             positional = not action.option_strings
             key = self.get_action_key(action, kwargs)
 
             if key and self.options.get('pop', None):
                 value = kwargs.pop(key)
+
             elif key:
                 value = kwargs.get(key)
+
             else:
                 value = None
 
@@ -421,6 +437,7 @@ class ArgumentParser(argparse.ArgumentParser):
             if positional:
                 if key:
                     add(dest, coerce_to_string(value))
+
                 elif varargs and varargs_index < len(varargs):
                     add(dest, coerce_to_string(varargs[varargs_index]))
                     varargs_index += 1
@@ -444,15 +461,17 @@ class ArgumentParser(argparse.ArgumentParser):
                 # kwargs
                 if key.startswith('--'):
                     add(dest, key)
+
                 else:
                     add(dest, '--{0}'.format(key))
 
                 if isinstance(value, list) and value:
                     add(dest, value)
+
                 elif isinstance(value, types.FunctionType):
                     add(dest, ArgparseFunctionWrapper(value))
+
                 else:
                     add(dest, coerce_to_string(value))
 
-        # XXX: Just return argv
         return info
