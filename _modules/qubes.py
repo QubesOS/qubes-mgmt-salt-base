@@ -16,7 +16,6 @@ Misc Helper Functions
 import collections
 import logging
 
-
 # Enable logging
 log = logging.getLogger(__name__)
 
@@ -48,15 +47,25 @@ def merge(target, source, create=False, allowed=None, append=False):
     for key, value in source.items():
         if isinstance(value, collections.Mapping):
             if key in target.keys() or create or key in allowed:
-                replace = merge(target.get(key, {}), value, create=create, allowed=allowed, append=append)
+                replace = merge(
+                    target.get(key, {}),
+                    value,
+                    create=create,
+                    allowed=allowed,
+                    append=append
+                )
                 target[key] = replace
         else:
             if key in target.keys() or create or key in allowed:
                 if append and (append is True or key in append):
-                    if isinstance(source[key], str) and isinstance(target.get(key, ''), str):
+                    if isinstance(source[key], str) and isinstance(
+                        target.get(key, ''), str
+                    ):
                         target.setdefault(key, '')
                         target[key] += source[key]
-                    elif isinstance(source[key], list) and isinstance(target.get(key, []), list):
+                    elif isinstance(source[key], list) and isinstance(
+                        target.get(key, []), list
+                    ):
                         target.setdefault(key, [])
                         target[key].extend(source[key])
                     else:
