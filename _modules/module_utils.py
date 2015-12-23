@@ -24,14 +24,10 @@ from inspect import getargvalues, stack
 # Salt libs
 import salt.config
 import salt.loader
-from salt.exceptions import (
-    CommandExecutionError, SaltInvocationError
-)
+from salt.exceptions import (CommandExecutionError, SaltInvocationError)
 
 # Salt + Qubes libs
-from qubes_utils import (
-    Status, coerce_to_string, coerce_to_list
-)
+from qubes_utils import (Status, coerce_to_string, coerce_to_list)
 
 # Enable logging
 import grp
@@ -61,10 +57,13 @@ class ArgparseFunctionWrapper(object):
 
     Function is still callable
     '''
+
     def __init__(self, func):
         self.func = func
+
     def __len__(self):
         return 0
+
     def __call__(self, *varargs, **kwargs):
         self.func(*varargs, **kwargs)
 
@@ -73,6 +72,7 @@ class ModuleBase(object):
     '''ModuleBase is a base class which contains base functionality and utility
        to implement the qvm-* commands
     '''
+
     def _set_debug_mode(self, args):
         __context__.setdefault('debug', [])
 
@@ -87,7 +87,9 @@ class ModuleBase(object):
                     args.status_mode.remove('debug')
                 if self.__virtualname__ in __context__['debug']:
                     __context__['debug'].remove(self.__virtualname__)
-        elif self.__virtualname__ in __context__['debug'] or '__all__' in __context__['debug']:
+        elif self.__virtualname__ in __context__[
+            'debug'
+        ] or '__all__' in __context__['debug']:
             if 'debug' not in args.status_mode:
                 args.status_mode.append('debug')
 
@@ -105,7 +107,11 @@ class ModuleBase(object):
         self.defaults.run_post_hook = kwargs.pop('run-post-hook', None)
 
         # Type of status mode to use (default: last)
-        self.defaults.status_mode = coerce_to_list(kwargs.pop('status-mode', 'last'))
+        self.defaults.status_mode = coerce_to_list(
+            kwargs.pop(
+                'status-mode', 'last'
+            )
+        )
         if not set(['last', 'all']).intersection(self.defaults.status_mode):
             self.defaults.status_mode.append('last')
 
@@ -131,7 +137,16 @@ class ModuleBase(object):
         self.args = self.argparser.parse_salt_args(*varargs, **kwargs)
         return self.args
 
-    def save_status(self, status=None, retcode=None, result=None, data=None, prefix=None, message='', error_message=''):
+    def save_status(
+        self,
+        status=None,
+        retcode=None,
+        result=None,
+        data=None,
+        prefix=None,
+        message='',
+        error_message=''
+    ):
         '''Merges data from individual status into master data dictionary
         which will be returned and includes all changes and comments as well
         as the overall status status
@@ -143,12 +158,26 @@ class ModuleBase(object):
         if not status.name:
             status.name = self.__virtualname__
 
-        status._format(retcode=retcode, result=result, data=data, prefix=prefix, message=message, error_message=error_message)
+        status._format(
+            retcode=retcode,
+            result=result,
+            data=data,
+            prefix=prefix,
+            message=message,
+            error_message=error_message
+        )
         self._data.append(status)
 
         return status
 
-    def run(self, cmd, test_ignore=False, post_hook=None, data=None, **options):
+    def run(
+        self,
+        cmd,
+        test_ignore=False,
+        post_hook=None,
+        data=None,
+        **options
+    ):
         '''Executes cmd using salt.utils run_all function.
 
         Fake status are returned instead of executing the command if test
@@ -160,8 +189,14 @@ class ModuleBase(object):
             if isinstance(cmd, list):
                 cmd = ' '.join(cmd)
 
-            status = Status(**__salt__['cmd.run_all'](
-                cmd, runas=self.run_as_user, output_loglevel='quiet', **options))
+            status = Status(
+                **__salt__['cmd.run_all'](
+                    cmd,
+                    runas=self.run_as_user,
+                    output_loglevel='quiet',
+                    **options
+                )
+            )
             delattr(status, 'pid')
 
         self._run_post_hook(post_hook, cmd, status, data)
@@ -185,17 +220,20 @@ class ModuleBase(object):
         status = Status()
         status_mode = 'last' if 'last' in self.defaults.status_mode else 'all'
         debug_mode = True if 'debug' in self.defaults.status_mode else False
-        return status._finalize(data=self._data,
-                                status_mode=status_mode,
-                                cli_mode=self.defaults.cli_mode,
-                                debug_mode=debug_mode,
-                                test_mode=__opts__['test'])
+        return status._finalize(
+            data=self._data,
+            status_mode=status_mode,
+            cli_mode=self.defaults.cli_mode,
+            debug_mode=debug_mode,
+            test_mode=__opts__['test']
+        )
 
 
 class ArgumentParser(argparse.ArgumentParser):
     '''
     Custom ArgumentParser.
     '''
+
     def __init__(self, **kwargs):
         super(ArgumentParser, self).__init__(**kwargs)
 
@@ -203,7 +241,8 @@ class ArgumentParser(argparse.ArgumentParser):
             flags=['flags'],
             hide=None,
             pop=False,
-            namespace=None)
+            namespace=None
+        )
 
     def error(self, message):
         """error(message: string)
@@ -214,7 +253,11 @@ class ArgumentParser(argparse.ArgumentParser):
         should either exit or raise an exception.
         """
         #self.print_usage(_sys.stderr)
-        raise CommandExecutionError('{0}: error: {1}\n'.format(self.prog, message))
+        raise CommandExecutionError(
+            '{0}: error: {1}\n'.format(
+                self.prog, message
+            )
+        )
 
     # XXX: Try Marek's version
     #@staticmethod
@@ -235,14 +278,24 @@ class ArgumentParser(argparse.ArgumentParser):
         return None
 
     def parse_args(self, args=None, namespace=None):
-        if namespace is None and self.options.get('namespace', None) is not None:
+        if namespace is None and self.options.get(
+            'namespace', None
+        ) is not None:
             namespace = self.options['namespace']
-        return super(ArgumentParser, self).parse_args(args=args, namespace=namespace)
+        return super(ArgumentParser, self).parse_args(
+            args=args,
+            namespace=namespace
+        )
 
     def parse_known_args(self, args=None, namespace=None):
-        if namespace is None and self.options.get('namespace', None) is not None:
+        if namespace is None and self.options.get(
+            'namespace', None
+        ) is not None:
             namespace = self.options['namespace']
-        return super(ArgumentParser, self).parse_known_args(args=args, namespace=namespace)
+        return super(ArgumentParser, self).parse_known_args(
+            args=args,
+            namespace=namespace
+        )
 
     def parse_salt_args(self, *varargs, **kwargs):
         arg_info = self.create_argv_list('salt', *varargs, **kwargs)
@@ -318,8 +371,8 @@ class ArgumentParser(argparse.ArgumentParser):
         info['__argv_hidden'] = []
 
         argv = []
-        positional_arguments =  self.get_argument_group('positional arguments')
-        optional_arguments =  self.get_argument_group('optional arguments')
+        positional_arguments = self.get_argument_group('positional arguments')
+        optional_arguments = self.get_argument_group('optional arguments')
 
         def add(dest, value):
             if value and isinstance(value, list):
