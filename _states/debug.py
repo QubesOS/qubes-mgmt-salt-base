@@ -11,11 +11,16 @@ Qubes test state functions
 ==========================
 '''
 
+from __future__ import absolute_import
+
 # Import python libs
 import logging
 
 # Salt libs
 from salt.exceptions import (CommandExecutionError, SaltInvocationError)
+
+# Salt + Qubes libs
+from qubes_utils import Status  # pylint: disable=E0401
 
 log = logging.getLogger(__name__)
 
@@ -31,13 +36,17 @@ def _state_action(_action, *varargs, **kwargs):
     '''
     try:
         status = __salt__[_action](*varargs, **kwargs)
-    except (SaltInvocationError, CommandExecutionError), e:
+
+    except (SaltInvocationError, CommandExecutionError) as e:
         status = Status(retcode=1, stderr=e.message + '\n')
+
     return vars(status)
 
 
 def mode(name, *varargs, **kwargs):
     '''
-    Sets debug mode for all or specific states status
+    Sets debug mode for all or specific states status.
+
+    :param name:
     '''
     return _state_action('debug.mode', name, *varargs, **kwargs)
