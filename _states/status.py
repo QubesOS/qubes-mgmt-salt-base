@@ -15,9 +15,7 @@ Qubes misc state functions
 import logging
 
 # Salt libs
-from salt.exceptions import (
-    CommandExecutionError, SaltInvocationError
-)
+from salt.exceptions import (CommandExecutionError, SaltInvocationError)
 
 # Salt + Qubes libs
 from qubes_utils import Status
