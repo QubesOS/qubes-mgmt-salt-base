@@ -11,16 +11,15 @@ Qubes test modules for salt
 ===========================
 '''
 
-# Import python libs
-import argparse
-import logging
+from __future__ import absolute_import
 
-from inspect import getargvalues, stack
+# Import python libs
+import argparse  # pylint: disable=E0598
+import logging
 
 # Salt + Qubes libs
 import module_utils
 
-from qubes_utils import function_alias as _function_alias
 from module_utils import ModuleBase as _ModuleBase
 
 # Enable logging
@@ -34,10 +33,6 @@ def __virtual__():
     '''
     '''
     return __virtualname__
-
-#__outputter__ = {
-#    'get_prefs': 'txt',
-#}
 
 
 class _TestBase(_ModuleBase):
@@ -71,7 +66,6 @@ def mode(*varargs, **kwargs):
         - enable:               [MODULE ...]
         - disable:              [MODULE ...]
     '''
-    #self.arg_options_create(argv_ordering=['flags', 'args', 'varargs', 'keywords'])
     base = _TestBase('debug.mode', **kwargs)
     base.parser.add_argument(
         '--status-mode',
@@ -111,8 +105,8 @@ def mode(*varargs, **kwargs):
 
     # Enable
     if args.enable_all:
-        if '__all__' not in base._debug_mode:
-            base._debug_mode.append('__all__')
+        if '__all__' not in base._debug_mode:  # pylint: disable=W0212
+            base._debug_mode.append('__all__')  # pylint: disable=W0212
             base.save_status(message='Enabled \'ALL\'')
         else:
             base.save_status(
@@ -121,8 +115,8 @@ def mode(*varargs, **kwargs):
             )
     elif args.enable:
         for module in args.enable:
-            if module not in base._debug_mode:
-                base._debug_mode.append(module)
+            if module not in base._debug_mode:  # pylint: disable=W0212
+                base._debug_mode.append(module)  # pylint: disable=W0212
                 base.save_status(message='Enabled \'{0}\''.format(module))
             else:
                 base.save_status(
@@ -132,13 +126,16 @@ def mode(*varargs, **kwargs):
 
     # Disable
     if args.disable_all:
-        for module in sorted(base._debug_mode, reverse=True):
-            base._debug_mode.remove(module)
+        for module in sorted(
+            base._debug_mode,
+            reverse=True
+        ):  # pylint: disable=W0212
+            base._debug_mode.remove(module)  # pylint: disable=W0212
             base.save_status(message='Disabled \'{0}\''.format(module))
     elif args.disable:
         for module in args.disable:
-            if module in base._debug_mode:
-                base._debug_mode.remove(module)
+            if module in base._debug_mode:  # pylint: disable=W0212
+                base._debug_mode.remove(module)  # pylint: disable=W0212
                 base.save_status(message='Disabled \'{0}\''.format(module))
             else:
                 base.save_status(
