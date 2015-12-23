@@ -2,6 +2,8 @@
 #
 # vim: set ts=4 sw=4 sts=4 et :
 
+from __future__ import absolute_import
+
 import salt.config
 import salt.grains.core
 
@@ -15,8 +17,9 @@ def whonix():
     '''
     grains = {}
     if salt.grains.core.os_data()['os'] == 'Whonix':
-        grains = {}
-        grains['virtual'] = 'Qubes+Whonix'
-        grains['os'] = 'Debian'
-        grains['os_family'] = 'Debian'
+        grains = {
+            'virtual': 'Qubes+Whonix',
+            'os': 'Debian',
+            'os_family': 'Debian'
+        }
     return grains
