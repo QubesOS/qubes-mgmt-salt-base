@@ -30,18 +30,18 @@ log = logging.getLogger(__name__)
 class Status(argparse.Namespace):
     def __init__(self, *args, **kwargs):
         defaults = {
-            'name':  '',
-            'result':  None,
+            'name': '',
+            'result': None,
             'retcode': 0,
-            'stdout':  '',
-            'stderr':  '',
-            'data':  None,
+            'stdout': '',
+            'stderr': '',
+            'data': None,
             'changes': {},
             'comment': '',
             'prefix': '',
             'message': '',
             'error_message': '',
-            }
+        }
 
         defaults.update(kwargs)
         super(Status, self).__init__(**defaults)
@@ -62,16 +62,32 @@ class Status(argparse.Namespace):
     # 'retcode': 0 == pass / 1+ == fail (usually a shell return code)
     # 'result':  True == pass / False == fail / None == Unused
     def passed(self, **kwargs):
-        return self.result if self.result is not None else not bool(self.retcode)
+        return self.result if self.result is not None else not bool(
+            self.retcode
+        )
 
     def failed(self, **kwargs):
-        return not self.result if self.result is not None else bool(self.retcode)
+        return not self.result if self.result is not None else bool(
+            self.retcode
+        )
 
-    def _format(self, name=None, retcode=None, result=None, data=None, prefix=None, message='', error_message=''):
+    def _format(
+        self,
+        name=None,
+        retcode=None,
+        result=None,
+        data=None,
+        prefix=None,
+        message='',
+        error_message=''
+    ):
         '''Combines argument variables and formats the status.
         '''
         # Copy args to status. Passed args override status set args
-        args = ['name', 'retcode', 'result', 'data', 'prefix', 'message', 'error_message']
+        args = [
+            'name', 'retcode', 'result', 'data', 'prefix', 'message',
+            'error_message'
+        ]
         for arg in args:
             if arg not in self or locals().get(arg, None):
                 setattr(self, arg, locals()[arg])
@@ -101,14 +117,26 @@ class Status(argparse.Namespace):
                 if message:
                     stderr += '{0}{1}'.format(prefix, message)
                 if self.stdout.strip():
-                    stderr += '\n{0}{1}'.format(indent, self.stdout.strip().replace('\n', '\n' + indent))
+                    stderr += '\n{0}{1}'.format(
+                        indent, self.stdout.strip().replace(
+                            '\n', '\n' + indent
+                        )
+                    )
                 if self.stderr.strip():
-                    stderr += '\n{0}{1}'.format(indent, self.stderr.strip().replace('\n', '\n' + indent))
+                    stderr += '\n{0}{1}'.format(
+                        indent, self.stderr.strip().replace(
+                            '\n', '\n' + indent
+                        )
+                    )
             else:
                 if message:
                     stdout += '{0}{1}'.format(prefix, message)
                 if self.stdout.strip():
-                    stdout += '\n{0}{1}'.format(indent, self.stdout.strip().replace('\n', '\n' + indent))
+                    stdout += '\n{0}{1}'.format(
+                        indent, self.stdout.strip().replace(
+                            '\n', '\n' + indent
+                        )
+                    )
 
             if stderr:
                 if stdout:
@@ -118,7 +146,14 @@ class Status(argparse.Namespace):
 
             return self
 
-    def _finalize(self, data=[], status_mode='last', cli_mode=False, debug_mode=False, test_mode=False):
+    def _finalize(
+        self,
+        data=[],
+        status_mode='last',
+        cli_mode=False,
+        debug_mode=False,
+        test_mode=False
+    ):
         '''Merges provided list of status and prepares status
         for return to salt.
 
@@ -140,6 +175,7 @@ class Status(argparse.Namespace):
         test_mode:
             True if test mode is enabled, otherwise false
         '''
+
         def linefeed(text):
             return '\n' if text else ''
 
@@ -199,19 +235,19 @@ class Status(argparse.Namespace):
         # If called by CLI only return stdout
         if cli_mode:
             return dict(
-                retcode = retcode,
-                stdout  = status.stdout or comment,
-                stderr  = status.stdout,
+                retcode=retcode,
+                stdout=status.stdout or comment,
+                stderr=status.stdout,
             )
 
         return Status(
-            name    = status.name,
-            retcode = retcode,
-            result  = status.result,
-            comment = comment,
-            stdout  = status.stdout,
-            stderr  = status.stdout,
-            changes = changes,
+            name=status.name,
+            retcode=retcode,
+            result=status.result,
+            comment=comment,
+            stdout=status.stdout,
+            stderr=status.stdout,
+            changes=changes,
         )
 
 
@@ -234,7 +270,7 @@ def coerce_to_list(value):
     if not value:
         value = []
     elif isinstance(value, str):
-        value = [value,]
+        value = [value, ]
     elif isinstance(value, tuple):
         value = list(value)
     return value
@@ -258,16 +294,20 @@ def function_alias(new_name):
     Doc strings are also copied to wrapper so they are available to salt command
     line interface via the --doc option.
     '''
+
     def outer(func):
         frame = stack()[0][0]
         func_globals = frame.f_back.f_globals
 
         if '__virtualname__' in func_globals:
-            func.__virtualname__ = '{0}.{1}'.format(func_globals['__virtualname__'], new_name)
+            func.__virtualname__ = '{0}.{1}'.format(
+                func_globals['__virtualname__'], new_name
+            )
 
         def wrapper(*varargs, **kwargs):
             module = func(*varargs, **kwargs)
             return module()
+
         wrapper.func = func
 
         if 'usage' in dir(func):
@@ -279,6 +319,7 @@ def function_alias(new_name):
         func_globals_save = {new_name: wrapper}
         func_globals.update(func_globals_save)
         return func
+
     return outer
 
 
@@ -309,15 +350,25 @@ def update(target, source, create=False, allowed=None, append=False):
     for key, value in source.items():
         if isinstance(value, collections.Mapping):
             if key in target.keys() or create or key in allowed:
-                replace = update(target.get(key, {}), value, create=create, allowed=allowed, append=append)
+                replace = update(
+                    target.get(key, {}),
+                    value,
+                    create=create,
+                    allowed=allowed,
+                    append=append
+                )
                 target[key] = replace
         else:
             if key in target.keys() or create or key in allowed:
                 if append and (append is True or key in append):
-                    if isinstance(source[key], str) and isinstance(target.get(key, ''), str):
+                    if isinstance(source[key], str) and isinstance(
+                        target.get(key, ''), str
+                    ):
                         target.setdefault(key, '')
                         target[key] += source[key]
-                    elif isinstance(source[key], list) and isinstance(target.get(key, []), list):
+                    elif isinstance(source[key], list) and isinstance(
+                        target.get(key, []), list
+                    ):
                         target.setdefault(key, [])
                         target[key].extend(source[key])
                     else:
