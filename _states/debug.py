@@ -15,9 +15,7 @@ Qubes test state functions
 import logging
 
 # Salt libs
-from salt.exceptions import (
-    CommandExecutionError, SaltInvocationError
-)
+from salt.exceptions import (CommandExecutionError, SaltInvocationError)
 
 log = logging.getLogger(__name__)
 
