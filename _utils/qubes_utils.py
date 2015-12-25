@@ -12,9 +12,10 @@ Misc Utility Functions
 ======================
 '''
 
+from __future__ import absolute_import
+
 # Import python libs
-import argparse
-import types
+import argparse  # pylint: disable=E0598
 import collections
 import logging
 
@@ -27,21 +28,22 @@ import salt.utils
 log = logging.getLogger(__name__)
 
 
+# pylint: disable=E1101
 class Status(argparse.Namespace):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # pylint: disable=W0613
         defaults = {
-            'name':  '',
-            'result':  None,
+            'name': '',
+            'result': None,
             'retcode': 0,
-            'stdout':  '',
-            'stderr':  '',
-            'data':  None,
+            'stdout': '',
+            'stderr': '',
+            'data': None,
             'changes': {},
             'comment': '',
             'prefix': '',
             'message': '',
             'error_message': '',
-            }
+        }
 
         defaults.update(kwargs)
         super(Status, self).__init__(**defaults)
@@ -51,32 +53,54 @@ class Status(argparse.Namespace):
 
     def reset(self, key, default=None):
         value = getattr(self, key, default)
-        self[key] = type(self[key])()
+        self[key] = type(self[key])()  # pylint: disable=E1136
         return value
 
-    # - 'result' or 'retcode' are the indicators of a successful status
-    # - If 'result' is not None that value is used and 'retcode' ignored
-    #   which allows retcode to be overridden if needed.  If 'result' is None
-    #   the value from 'retcode' is used to determine a pass or fail.
-    #
-    # 'retcode': 0 == pass / 1+ == fail (usually a shell return code)
-    # 'result':  True == pass / False == fail / None == Unused
-    def passed(self, **kwargs):
-        return self.result if self.result is not None else not bool(self.retcode)
-
-    def failed(self, **kwargs):
-        return not self.result if self.result is not None else bool(self.retcode)
-
-    def _format(self, name=None, retcode=None, result=None, data=None, prefix=None, message='', error_message=''):
-        '''Combines argument variables and formats the status.
+    def passed(self, **kwargs):  # pylint: disable=W0613
         '''
-        # Copy args to status. Passed args override status set args
-        args = ['name', 'retcode', 'result', 'data', 'prefix', 'message', 'error_message']
+        'result' or 'retcode' are the indicators of a successful status.
+
+        If 'result' is not None that value is used and 'retcode' ignored
+        which allows retcode to be overridden if needed.  If 'result' is None
+        the value from 'retcode' is used to determine a pass or fail.
+
+        'retcode': 0 == pass / 1+ == fail (usually a shell return code)
+        'result':  True == pass / False == fail / None == Unused
+        '''
+        return self.result if self.result is not None else not bool(
+            self.retcode
+        )
+
+    def failed(self, **kwargs):  # pylint: disable=W0613
+        return not self.result if self.result is not None else bool(
+            self.retcode
+        )
+
+    # pylint: disable=W0613
+    def _format(
+        self,
+        name=None,
+        retcode=None,
+        result=None,
+        data=None,
+        prefix=None,
+        message='',
+        error_message=''
+    ):
+        '''Combines argument variables and formats the status.
+
+        Copy args to status. Passed args override status set args.
+        '''
+        args = [
+            'name', 'retcode', 'result', 'data', 'prefix', 'message',
+            'error_message'
+        ]
+
         for arg in args:
             if arg not in self or locals().get(arg, None):
                 setattr(self, arg, locals()[arg])
 
-        if not self.comment:
+        if not self.comment:  # pylint: disable=E0203
             # ------------------------------------------------------------------
             # Create comment
             # ------------------------------------------------------------------
@@ -92,6 +116,7 @@ class Status(argparse.Namespace):
             if self.failed():
                 if error_message:
                     message = error_message
+
             if not message:
                 indent = ''
                 message = message.strip()
@@ -100,51 +125,77 @@ class Status(argparse.Namespace):
             if self.failed() and self.stderr.strip():
                 if message:
                     stderr += '{0}{1}'.format(prefix, message)
+
                 if self.stdout.strip():
-                    stderr += '\n{0}{1}'.format(indent, self.stdout.strip().replace('\n', '\n' + indent))
+                    stderr += '\n{0}{1}'.format(
+                        indent, self.stdout.strip().replace(
+                            '\n', '\n' + indent
+                        )
+                    )
+
                 if self.stderr.strip():
-                    stderr += '\n{0}{1}'.format(indent, self.stderr.strip().replace('\n', '\n' + indent))
+                    stderr += '\n{0}{1}'.format(
+                        indent, self.stderr.strip().replace(
+                            '\n', '\n' + indent
+                        )
+                    )
+
             else:
                 if message:
                     stdout += '{0}{1}'.format(prefix, message)
+
                 if self.stdout.strip():
-                    stdout += '\n{0}{1}'.format(indent, self.stdout.strip().replace('\n', '\n' + indent))
+                    stdout += '\n{0}{1}'.format(
+                        indent, self.stdout.strip().replace(
+                            '\n', '\n' + indent
+                        )
+                    )
 
             if stderr:
                 if stdout:
                     stdout = '====== stdout ======\n{0}\n\n'.format(stdout)
                 stderr = '====== stderr ======\n{0}'.format(stderr)
-            self.comment = stdout + stderr
+
+            self.comment = stdout + stderr  # pylint: disable=W0201
 
             return self
 
-    def _finalize(self, data=[], status_mode='last', cli_mode=False, debug_mode=False, test_mode=False):
-        '''Merges provided list of status and prepares status
+    def _finalize(
+        self, data=None,
+        status_mode='last',
+        cli_mode=False,
+        debug_mode=False,
+        test_mode=False
+    ):
+        '''
+        Merges provided list of status and prepares status
         for return to salt.
 
-        Additional messages may be appended to stdout
+        Additional messages may be appended to stdout.
 
         data:
-            List of status to merge
+            List of status to merge.
 
         status_mode:
-            all or last. last only uses last retcode to determine overall
-            success where all will fail on first failure code
+            'all' or 'last'. last only uses last retcode to determine overall
+            success where all will fail on first failure code.
 
         cli_mode:
-            True if called by commandline interface, otherwise false
+            True if called by commandline interface, otherwise False.
 
         debug_mode:
-            Merges all status messages
+            Merges all status messages.
 
         test_mode:
-            True if test mode is enabled, otherwise false
+            True if test mode is enabled, otherwise False.
         '''
+        if data is None:
+            data = []
+
         def linefeed(text):
             return '\n' if text else ''
 
         comment = ''
-        message = ''
         changes = {}
 
         if not data:
@@ -154,8 +205,10 @@ class Status(argparse.Namespace):
         if status_mode in ['last']:
             status = data[-1]
             retcode = status.retcode
+
             if status.result is not None:
                 retcode = not status.result
+
             if status.passed():
                 index = -1
 
@@ -175,13 +228,16 @@ class Status(argparse.Namespace):
             # reflects last run state, where 'result' is set explicitly
             if status.result is not None:
                 retcode = not status.result
+
             elif status.retcode and status_mode in ['all']:
                 retcode = status.retcode
 
             if status.result and test_mode:
                 status.result = None
+
             elif test_mode:
                 status.result = None if not retcode else False
+
             else:
                 status.result = True if not retcode else False
 
@@ -189,6 +245,7 @@ class Status(argparse.Namespace):
             if status.changes and status.passed():
                 name = getattr(status, 'name', '')  # or self.__virtualname__
                 changes.setdefault(name, {})
+
                 for key, value in status.changes.items():
                     changes[name][key] = value
 
@@ -199,29 +256,34 @@ class Status(argparse.Namespace):
         # If called by CLI only return stdout
         if cli_mode:
             return dict(
-                retcode = retcode,
-                stdout  = status.stdout or comment,
-                stderr  = status.stdout,
+                retcode=retcode,
+                stdout=status.stdout or comment,
+                stderr=status.stdout,
             )
 
         return Status(
-            name    = status.name,
-            retcode = retcode,
-            result  = status.result,
-            comment = comment,
-            stdout  = status.stdout,
-            stderr  = status.stdout,
-            changes = changes,
+            name=status.name,
+            retcode=retcode,
+            result=status.result,
+            comment=comment,
+            stdout=status.stdout,
+            stderr=status.stdout,
+            changes=changes,
         )
 
 
 def coerce_to_string(value):
-    '''Convert value to string when possible (for argparse)
+    '''
+    Convert value to string when possible (for argparse).
+
+    :param value:
     '''
     if value is None:
         value = ''
-    elif isinstance(value, types.ListType):
+
+    elif isinstance(value, list):
         value = ' '.join(value)
+
     else:
         value = str(value)
 
@@ -229,21 +291,30 @@ def coerce_to_string(value):
 
 
 def coerce_to_list(value):
-    '''Converts value to a list.
+    '''
+    Converts value to a list.
+
+    :param value:
     '''
     if not value:
         value = []
+
     elif isinstance(value, str):
-        value = [value,]
+        value = [value, ]
+
     elif isinstance(value, tuple):
         value = list(value)
+
     return value
 
 
 def get_fnargs(function, **kwargs):
-    '''Returns all args that a function uses along with default values.
     '''
-    args, fnargs = salt.utils.arg_lookup(function).values()
+    Returns all args that a function uses along with default values.
+
+    :param function:
+    '''
+    fnargs = salt.utils.arg_lookup(function).values()[1]
     for key, value in kwargs.items():
         if key in fnargs:
             fnargs[key] = value
@@ -252,26 +323,32 @@ def get_fnargs(function, **kwargs):
 
 def function_alias(new_name):
     '''
-    Creates a generated function alias that initializes decorator class then calls
-    the instance and returns any values.
+    Creates a generated function alias that initializes decorator class then
+    calls the instance and returns any values.
 
     Doc strings are also copied to wrapper so they are available to salt command
     line interface via the --doc option.
+
+    :param new_name:
     '''
     def outer(func):
         frame = stack()[0][0]
         func_globals = frame.f_back.f_globals
 
         if '__virtualname__' in func_globals:
-            func.__virtualname__ = '{0}.{1}'.format(func_globals['__virtualname__'], new_name)
+            func.__virtualname__ = '{0}.{1}'.format(
+                func_globals['__virtualname__'], new_name
+            )
 
         def wrapper(*varargs, **kwargs):
             module = func(*varargs, **kwargs)
             return module()
+
         wrapper.func = func
 
         if 'usage' in dir(func):
             wrapper.__doc__ = func.usage()
+
         else:
             wrapper.__doc__ = func.__doc__
 
@@ -279,6 +356,7 @@ def function_alias(new_name):
         func_globals_save = {new_name: wrapper}
         func_globals.update(func_globals_save)
         return func
+
     return outer
 
 
@@ -287,21 +365,21 @@ def update(target, source, create=False, allowed=None, append=False):
     Updates the values of a nested dictionary of varying depth without over-
     writing the targets root nodes.
 
-    target
-        Target dictionary to update
+    :param target:
+        Target dictionary to update.
 
-    source
-        Source dictionary that will be used to update `target`
+    :param source:
+        Source dictionary that will be used to update `target`.
 
-    create
-        if True then new keys can be created during update, otherwise they will be tossed
-        if they do not exist in `target`.
+    :param create:
+        If True then new keys can be created during update, otherwise they will
+        be tossed if they do not exist in `target`.
 
-    allowed
-        list of allowed keys that can be created even if create is False
+    :param allowed:
+        List of allowed keys that can be created even if create is False.
 
-    append [True] or ['list_of_keys', 'key4']
-        appends to strings or lists if append is True or key in list
+    :param append:  [True] or ['list_of_keys', 'key4']
+        Appends to strings or lists if append is True or key in list.
     '''
     if not allowed:
         allowed = []
@@ -309,19 +387,34 @@ def update(target, source, create=False, allowed=None, append=False):
     for key, value in source.items():
         if isinstance(value, collections.Mapping):
             if key in target.keys() or create or key in allowed:
-                replace = update(target.get(key, {}), value, create=create, allowed=allowed, append=append)
+                replace = update(
+                    target.get(key, {}),
+                    value,
+                    create=create,
+                    allowed=allowed,
+                    append=append
+                )
                 target[key] = replace
+
         else:
             if key in target.keys() or create or key in allowed:
                 if append and (append is True or key in append):
-                    if isinstance(source[key], str) and isinstance(target.get(key, ''), str):
+                    if isinstance(source[key], str) and isinstance(
+                        target.get(key, ''), str
+                    ):
                         target.setdefault(key, '')
                         target[key] += source[key]
-                    elif isinstance(source[key], list) and isinstance(target.get(key, []), list):
+
+                    elif isinstance(source[key], list) and isinstance(
+                        target.get(key, []), list
+                    ):
                         target.setdefault(key, [])
                         target[key].extend(source[key])
+
                     else:
                         target[key] = source[key]
+
                 else:
                     target[key] = source[key]
+
     return target

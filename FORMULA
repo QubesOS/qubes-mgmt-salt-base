@@ -1,17 +1,13 @@
 # vim: set syntax=yaml ts=2 sw=2 sts=2 et :
 
 package-name:       qubes-mgmt-salt-base
+saltenv:            base
+version:            3.1.1
+release:            1
 name:               qubes-base-formula
 top_level_dir:      qubes
 formula-files:      _modules _states _grains _utils
-pillar-files:
-test-formula-files: 
-test-pillar-files: 
-formula_dir:        /srv/salt
-pillar_dir:         /srv/pillar
-saltenv:            base
-version:            3.0.0
-release:            1
+formula_dir:        $(MGMT_DEFAULT_STATE_DIR)
 os:                 RedHat, Debian, Ubuntu, Suse, FreeBSD
 os_family:          RedHat, Debian, Suse, FreeBSD
 summary:            Custom base modules and states that are shared between dom0 and VM.

@@ -2,6 +2,8 @@
 #
 # vim: set ts=4 sw=4 sts=4 et :
 
+from __future__ import absolute_import
+
 import salt.config
 import salt.grains.core
 
@@ -14,10 +16,6 @@ def qubes_dom0():
     Redefine qubes grains.
     '''
     grains = {}
-    if salt.grains.core.os_data()['os'] == 'Qubes': 
-        grains = {}
-        grains['virtual'] = 'Qubes'
-        grains['os'] = 'Fedora'
-        grains['os_family'] = 'RedHat'
+    if salt.grains.core.os_data()['os'] == 'Qubes':
+        grains = {'virtual': 'Qubes', 'os': 'Fedora', 'os_family': 'RedHat'}
     return grains
-
