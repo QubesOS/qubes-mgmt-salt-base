@@ -1,3 +1,32 @@
+qubes-mgmt-salt-base (3.1.2-1) wheezy; urgency=medium
+
+  [ Jason Mehring ]
+  * Makefile:  Added a few formatting line feeds
+  * rpm: Fix typo
+  * FORMULA: Use Makefile VARS for formula_dir, etc and re-ordered
+    fields
+  * grains:  pci_devs.py:  Use salt.utils.which to loacate lspci binary
+  * debian: Fix broken "state.sls config" statement
+  * grains: pci_devs - reformatted
+  * grains: redefined_dom0_grains - reformatted
+  * modules: debug - reformatted
+  * modules: module_utils - reformatted
+  * modules: qubes - reformatted
+  * states: debug - reformatted
+  * states: status - reformatted
+  * utils: qubes_utils - reformatted
+  * grains: whonix - reformatted
+  * grains: redefined_dom0_grains - pylint
+  * grains: whonix - pylint
+  * modules: debug - pylint
+  * modules: module_utils - pylint
+  * modules: qubes - pylint
+  * states: debug - pylint
+  * states: status - pylint
+  * utils: qubes_utils - pylint
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sat, 26 Dec 2015 01:12:53 +0100
+
 qubes-mgmt-salt-base (3.1.1-1) wheezy; urgency=medium
 
   * Use first member of 'qubes' group instead of hardcoded 'user' user
