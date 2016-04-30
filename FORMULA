@@ -6,7 +6,7 @@ version:            3.1.2
 release:            1
 name:               qubes-base-formula
 top_level_dir:      qubes
-formula-files:      _modules _states _grains _utils
+formula-files:      _modules _states _grains _utils _extensions
 formula_dir:        $(MGMT_DEFAULT_STATE_DIR)
 os:                 RedHat, Debian, Ubuntu, Suse, FreeBSD
 os_family:          RedHat, Debian, Suse, FreeBSD

@@ -41,6 +41,9 @@ qubesctl saltutil.sync_all refresh=true -l quiet --out quiet > /dev/null || true
 %files
 %defattr(-,root,root)
 %doc LICENSE README.rst
+%config(noreplace) /etc/salt/minion.d/qubes_ext_pillar.conf
+%config(noreplace) /etc/salt/minion.d/extensions.conf
+
 %attr(750, root, root) %dir /srv/salt/_grains
 /srv/salt/_grains/redefined_dom0_grains.py*
 /srv/salt/_grains/whonix.py*
@@ -59,5 +62,9 @@ qubesctl saltutil.sync_all refresh=true -l quiet --out quiet > /dev/null || true
 /srv/salt/_utils/__init__.py*
 /srv/salt/_utils/nulltype.py*
 /srv/salt/_utils/qubes_utils.py*
+
+%attr(750, root, root) %dir /srv/salt/_extensions
+%attr(750, root, root) %dir /srv/salt/_extensions/pillar
+/srv/salt/_extensions/pillar/qvm_prefs.py*
 
 %changelog
