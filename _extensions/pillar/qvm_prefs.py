@@ -18,13 +18,15 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-#
-#
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+# USA.
 
 in_dom0 = True
 try:
-    from qubes.qubes import QubesVmCollection
+    import qubes
+    import qubes.vm.templatevm
+    import qubes.vm.standalonevm
+    import qubes.vm.appvm
 except ImportError:
     in_dom0 = False
 
@@ -34,24 +36,21 @@ def __virtual__():
 
 
 def ext_pillar(minion_id, pillar, *args, **kwargs):
-    qc = QubesVmCollection()
-    qc.lock_db_for_reading()
-    qc.load()
-    qc.unlock_db()
-    vm = qc.get_vm_by_name(minion_id)
+    app = qubes.Qubes()
+    vm = app.domains[minion_id]
     if vm is None:
         return {}
     qvm_pillar = {}
     if vm.qid == 0:
         qvm_pillar['type'] = 'admin'
-    elif vm.is_template():
+    elif isinstance(vm, qubes.vm.templatevm.TemplateVM):
         qvm_pillar['type'] = 'template'
-    elif vm.template is None:
+    elif isinstance(vm, qubes.vm.standalonevm.StandaloneVM):
         qvm_pillar['type'] = 'standalone'
     else:
         qvm_pillar['type'] = 'app'
 
-    if vm.template:
+    if hasattr(vm, 'template'):
         qvm_pillar['template'] = vm.template.name
 
     if vm.netvm:
