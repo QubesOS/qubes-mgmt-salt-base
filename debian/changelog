@@ -1,3 +1,9 @@
+qubes-mgmt-salt-base (3.2.2-1) wheezy; urgency=medium
+
+  * grains: add boot mode grain
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Tue, 19 Jul 2016 02:13:56 +0200
+
 qubes-mgmt-salt-base (3.2.1-1) wheezy; urgency=medium
 
   * travis: initial version
