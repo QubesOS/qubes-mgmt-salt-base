@@ -37,9 +37,11 @@ def __virtual__():
 
 def ext_pillar(minion_id, pillar, *args, **kwargs):
     app = qubes.Qubes()
-    vm = app.domains[minion_id]
-    if vm is None:
+    try:
+        vm = app.domains[minion_id]
+    except KeyError:
         return {}
+
     qvm_pillar = {}
     if vm.qid == 0:
         qvm_pillar['type'] = 'admin'
