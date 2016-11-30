@@ -1,3 +1,12 @@
+qubes-mgmt-salt-base (4.0.0-1) wheezy; urgency=medium
+
+  [ Bahtiar `kalkin-` Gadimov ]
+  * Update qvm_prefs extension to current API
+  * Add .pylintrc
+  * qvm-prefs pillar return None for non existing vms
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Wed, 30 Nov 2016 13:03:10 +0100
+
 qubes-mgmt-salt-base (3.2.2-1) wheezy; urgency=medium
 
   * grains: add boot mode grain
