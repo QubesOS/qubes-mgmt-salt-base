@@ -21,22 +21,20 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
 # USA.
 
-in_dom0 = True
+admin_available = True
 try:
-    import qubes
-    import qubes.vm.templatevm
-    import qubes.vm.standalonevm
-    import qubes.vm.appvm
+    import qubesadmin
+    import qubesadmin.vm
 except ImportError:
-    in_dom0 = False
+    admin_available = False
 
 
 def __virtual__():
-    return in_dom0
+    return admin_available
 
 
 def ext_pillar(minion_id, pillar, *args, **kwargs):
-    app = qubes.Qubes()
+    app = qubesadmin.Qubes()
     try:
         vm = app.domains[minion_id]
     except KeyError:
@@ -45,9 +43,9 @@ def ext_pillar(minion_id, pillar, *args, **kwargs):
     qvm_pillar = {}
     if vm.qid == 0:
         qvm_pillar['type'] = 'admin'
-    elif isinstance(vm, qubes.vm.templatevm.TemplateVM):
+    elif isinstance(vm, qubes.vm.TemplateVM):
         qvm_pillar['type'] = 'template'
-    elif isinstance(vm, qubes.vm.standalonevm.StandaloneVM):
+    elif isinstance(vm, qubes.vm.StandaloneVM):
         qvm_pillar['type'] = 'standalone'
     else:
         qvm_pillar['type'] = 'app'
