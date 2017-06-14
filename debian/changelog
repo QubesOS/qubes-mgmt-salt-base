@@ -1,3 +1,13 @@
+qubes-mgmt-salt-base (4.0.1-1) unstable; urgency=medium
+
+  * travis: drop debootstrap workaround
+  * Fix external pillar installation path
+  * Adjust qvm_prefs external pillar to use Admin API
+  * travis: switch to Qubes 4.0
+  * Adjust qvm_prefs external pillar to use Admin API cont
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 15 Jun 2017 00:07:38 +0200
+
 qubes-mgmt-salt-base (4.0.0-1) wheezy; urgency=medium
 
   [ Bahtiar `kalkin-` Gadimov ]
