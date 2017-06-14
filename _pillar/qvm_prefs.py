@@ -43,9 +43,9 @@ def ext_pillar(minion_id, pillar, *args, **kwargs):
     qvm_pillar = {}
     if vm.qid == 0:
         qvm_pillar['type'] = 'admin'
-    elif isinstance(vm, qubes.vm.TemplateVM):
+    elif isinstance(vm, qubesadmin.vm.TemplateVM):
         qvm_pillar['type'] = 'template'
-    elif isinstance(vm, qubes.vm.StandaloneVM):
+    elif isinstance(vm, qubesadmin.vm.StandaloneVM):
         qvm_pillar['type'] = 'standalone'
     else:
         qvm_pillar['type'] = 'app'
@@ -53,8 +53,8 @@ def ext_pillar(minion_id, pillar, *args, **kwargs):
     if hasattr(vm, 'template'):
         qvm_pillar['template'] = vm.template.name
 
-    if vm.netvm:
-        qvm_pillar['netvm'] = vm.netvm.name
+    if hasattr(vm, 'netvm'):
+        qvm_pillar['netvm'] = str(vm.netvm)
 
     # TODO: consider other properties; target VM will learn them!
 
