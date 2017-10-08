@@ -43,9 +43,9 @@ def ext_pillar(minion_id, pillar, *args, **kwargs):
     qvm_pillar = {}
     if vm.qid == 0:
         qvm_pillar['type'] = 'admin'
-    elif isinstance(vm, qubesadmin.vm.TemplateVM):
+    elif vm.klass == 'TemplateVM':
         qvm_pillar['type'] = 'template'
-    elif isinstance(vm, qubesadmin.vm.StandaloneVM):
+    elif vm.klass == 'StandaloneVM':
         qvm_pillar['type'] = 'standalone'
     else:
         qvm_pillar['type'] = 'app'
