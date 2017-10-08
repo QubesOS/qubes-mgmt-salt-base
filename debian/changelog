@@ -1,3 +1,9 @@
+qubes-mgmt-salt-base (4.0.2-1) unstable; urgency=medium
+
+  * Follow qubesadmin API change
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Sun, 08 Oct 2017 20:35:50 +0200
+
 qubes-mgmt-salt-base (4.0.1-1) unstable; urgency=medium
 
   * travis: drop debootstrap workaround
