@@ -1,7 +1,6 @@
-%{!?version: %define version %(cat version)}
 
 Name:      qubes-mgmt-salt-base
-Version:   %{version}
+Version:   @VERSION@
 Release:   1%{?dist}
 Summary:   Custom base modules and states that are shared between dom0 and VM.
 License:   GPL 2.0
@@ -16,17 +15,14 @@ Requires:  qubes-mgmt-salt-base-topd
 Requires:  qubes-mgmt-salt-base-config
 Requires(post): /usr/bin/qubesctl
 
-%define _builddir %(pwd)
+
+Source0: %{name}-%{version}.tar.gz
 
 %description
 Custom base modules and states that are shared between dom0 and VM.
 
 %prep
-# we operate on the current directory, so no need to unpack anything
-# symlink is to generate useful debuginfo packages
-rm -f %{name}-%{version}
-ln -sf . %{name}-%{version}
-%setup -T -D
+%setup -q
 
 %build
 
