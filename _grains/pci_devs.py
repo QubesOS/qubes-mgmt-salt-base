@@ -10,6 +10,12 @@ import salt.config
 import salt.grains.core
 import salt.utils
 
+# Handle legacy salt 2017.7.1
+try:
+    from salt.utils.path import which
+except ImportError:
+    from salt.utils import which
+
 __opts__ = salt.config.minion_config('/etc/salt/minion')
 salt.grains.core.__opts__ = __opts__
 
@@ -20,7 +26,7 @@ def pci_devs():
     '''
 
     def find_devices_of_class(klass):
-        lspci = salt.utils.which('lspci')
+        lspci = which('lspci')
 
         if lspci:
             p = subprocess.Popen([lspci, "-mm", "-n"], stdout=subprocess.PIPE)
