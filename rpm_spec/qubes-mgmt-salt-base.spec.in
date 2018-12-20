@@ -9,8 +9,10 @@ URL:	   http://www.qubes-os.org/
 Group:     System administration tools
 BuildArch: noarch
 Requires:  qubes-mgmt-salt-config
+%if 0%{?fedora} == 25
 Requires:  qubes-mgmt-salt-base-overrides
 Requires:  qubes-mgmt-salt-base-overrides-libs
+%endif
 Requires:  qubes-mgmt-salt-base-topd
 Requires:  qubes-mgmt-salt-base-config
 Requires(post): /usr/bin/qubesctl
