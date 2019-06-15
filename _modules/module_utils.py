@@ -133,9 +133,16 @@ class ModuleBase(object):
         self._set_debug_mode(self.defaults)
 
         # Salt module parser
-        self.argparser = ArgumentParser(
-                prog=__virtualname,
+        # FIXME: If the parent argparse already has --help, then adding it
+        # again would lead to an error. But now we might end up with no
+        # --help at all...
+        if 'argparser_parents' in kwargs:
+            self.argparser = ArgumentParser(
+                prog=__virtualname, add_help=False,
                 parents=kwargs.pop('argparser_parents',[]))
+        else:
+            self.argparser = ArgumentParser(prog=__virtualname)
+
         self.argparser.add_argument_group('salt')
         self.parser = self.argparser.get_argument_group('salt')
 
