@@ -428,60 +428,62 @@ class ArgumentParser(argparse.ArgumentParser):
 
         group = self.get_argument_group(group)
         varargs_index = 0
+        groups = kwargs.pop('groups',[])
+        groups.append(group)
+        for group in groups:
+            for action in group._group_actions:  # pylint: disable=W0212
+                dest = action.dest
+                positional = not action.option_strings
+                key = self.get_action_key(action, kwargs)
 
-        for action in group._group_actions:  # pylint: disable=W0212
-            dest = action.dest
-            positional = not action.option_strings
-            key = self.get_action_key(action, kwargs)
+                if key and self.options.get('pop', None):
+                    value = kwargs.pop(key)
 
-            if key and self.options.get('pop', None):
-                value = kwargs.pop(key)
+                elif key:
+                    value = kwargs.get(key)
 
-            elif key:
-                value = kwargs.get(key)
+                else:
+                    value = None
 
-            else:
-                value = None
+                # varargs
+                if positional:
+                    if key:
+                        add(dest, coerce_to_string(value))
 
-            # varargs
-            if positional:
-                if key:
-                    add(dest, coerce_to_string(value))
-
-                elif varargs and varargs_index < len(varargs):
-                    add(dest, coerce_to_string(varargs[varargs_index]))
-                    varargs_index += 1
-
-            # kwargs
-            else:
-
-                # flags
-                for flag_key in keyword_flag_keys:
-                    flags = kwargs.get(flag_key, {})
-                    if flags:
-                        flag = self.get_action_key(action, flags)
-                        if flag:
-                            if isinstance(flag, str):
-                                add(dest, '--{0}'.format(flag))
-                            continue
-
-                if not key:
-                    continue
+                    elif varargs and varargs_index < len(varargs):
+                        add(dest, coerce_to_string(varargs[varargs_index]))
+                        varargs_index += 1
 
                 # kwargs
-                if key.startswith('--'):
-                    add(dest, key)
-
                 else:
-                    add(dest, '--{0}'.format(key))
 
-                if isinstance(value, list) and value:
-                    add(dest, value)
+                    # flags
+                    for flag_key in keyword_flag_keys:
+                        flags = kwargs.get(flag_key, {})
+                        if flags:
+                            flag = self.get_action_key(action, flags)
+                            if flag:
+                                if isinstance(flag, str):
+                                    add(dest, '--{0}'.format(flag))
+                                continue
 
-                elif isinstance(value, types.FunctionType):
-                    add(dest, ArgparseFunctionWrapper(value))
+                    if not key:
+                        continue
 
-                else:
-                    add(dest, coerce_to_string(value))
+                    # kwargs
+                    if key.startswith('--'):
+                        add(dest, key)
+
+                    else:
+                        add(dest, '--{0}'.format(key))
+
+                    if isinstance(value, list) and value:
+                        add(dest, value)
+
+                    elif isinstance(value, types.FunctionType):
+                        add(dest, ArgparseFunctionWrapper(value))
+
+                    else:
+                        add(dest, coerce_to_string(value))
 
         return info
