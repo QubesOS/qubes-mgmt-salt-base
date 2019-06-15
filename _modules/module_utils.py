@@ -133,7 +133,9 @@ class ModuleBase(object):
         self._set_debug_mode(self.defaults)
 
         # Salt module parser
-        self.argparser = ArgumentParser(prog=__virtualname)
+        self.argparser = ArgumentParser(
+                prog=__virtualname,
+                parents=kwargs.pop('argparser_parents',[]))
         self.argparser.add_argument_group('salt')
         self.parser = self.argparser.get_argument_group('salt')
 
