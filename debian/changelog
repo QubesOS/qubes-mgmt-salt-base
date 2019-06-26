@@ -1,3 +1,9 @@
+qubes-mgmt-salt-base (4.1.1-1) unstable; urgency=medium
+
+  * pci_devs grains: do not advertise internal functions as grains
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 27 Jun 2019 01:46:51 +0200
+
 qubes-mgmt-salt-base (4.1.0-1) unstable; urgency=medium
 
   [ Frédéric Pierret (fepitre) ]
