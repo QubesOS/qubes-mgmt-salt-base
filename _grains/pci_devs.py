@@ -51,6 +51,7 @@ def pci_devs():
     grains = {
         'pci_net_devs': list(find_devices_of_class("02")),
         'pci_usb_devs': list(find_devices_of_class("0c03")),
+        'pci_audio_devs': list(find_devices_of_class("0403")),
     }
 
     return grains
