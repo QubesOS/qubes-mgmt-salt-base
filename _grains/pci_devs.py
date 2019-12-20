@@ -2,6 +2,7 @@
 #
 # vim: set ts=4 sw=4 sts=4 et :
 
+from __future__ import print_function
 import subprocess
 import re
 
@@ -9,6 +10,7 @@ import re
 import salt.config
 import salt.grains.core
 import salt.utils
+
 
 # Handle legacy salt 2017.7.1
 try:
@@ -34,14 +36,14 @@ def pci_devs():
             retcode = p.returncode
 
             if retcode != 0:
-                print "ERROR when executing lspci!"
+                print("ERROR when executing lspci!")
                 raise IOError
 
             rx_netdev = re.compile(
                 r"^([0-9a-f]{2}:[0-9a-f]{2}.[0-9a-f]) \"" + klass
             )
 
-            for dev in str(result[0]).splitlines():
+            for dev in str(result[0].decode()).splitlines():
                 match = rx_netdev.match(dev)
                 if match is not None:
                     dev_bdf = match.group(1)
