@@ -1,3 +1,14 @@
+qubes-mgmt-salt-base (4.1.2-1) unstable; urgency=medium
+
+  [ Frédéric Pierret (fepitre) ]
+  * travis: switch to bionic
+  * pci_devs: get audio devices
+
+  [ Marek Marczykowski-Górecki ]
+  * Make it compatible with Python3
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Mon, 06 Jan 2020 00:35:17 +0100
+
 qubes-mgmt-salt-base (4.1.1-1) unstable; urgency=medium
 
   * pci_devs grains: do not advertise internal functions as grains
