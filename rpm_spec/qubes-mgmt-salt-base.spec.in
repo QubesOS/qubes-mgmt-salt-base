@@ -8,13 +8,13 @@ URL:	   http://www.qubes-os.org/
 
 Group:     System administration tools
 BuildArch: noarch
+BuildRequires: make
 Requires:  qubes-mgmt-salt-config
 Requires:  qubes-mgmt-salt-base-overrides
 Requires:  qubes-mgmt-salt-base-overrides-libs
 Requires:  qubes-mgmt-salt-base-topd
 Requires:  qubes-mgmt-salt-base-config
 Requires(post): /usr/bin/qubesctl
-
 
 Source0: %{name}-%{version}.tar.gz
 
