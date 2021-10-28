@@ -1,3 +1,9 @@
+qubes-mgmt-salt-base (4.1.4-1) unstable; urgency=medium
+
+  * debian: drop obsolete qubes-mgmt-salt-base-overrides
+
+ -- Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>  Thu, 28 Oct 2021 02:39:47 +0200
+
 qubes-mgmt-salt-base (4.1.3-1) unstable; urgency=medium
 
   [ Frédéric Pierret (fepitre) ]
