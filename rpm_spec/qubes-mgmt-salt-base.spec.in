@@ -12,6 +12,8 @@ BuildRequires: make
 Requires:  qubes-mgmt-salt-config
 Requires:  qubes-mgmt-salt-base-topd
 Requires:  qubes-mgmt-salt-base-config
+Obsoletes: qubes-mgmt-salt-base-overrides < 4.1
+Obsoletes: qubes-mgmt-salt-base-overrides-libs < 4.1
 Requires(post): /usr/bin/qubesctl
 
 Source0: %{name}-%{version}.tar.gz
