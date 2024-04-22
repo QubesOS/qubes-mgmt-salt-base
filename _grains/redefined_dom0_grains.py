@@ -16,6 +16,6 @@ def qubes_dom0():
     Redefine qubes grains.
     '''
     grains = {}
-    if salt.grains.core.os_data()['os'] == 'Qubes':
+    if salt.grains.core.os_data()['os'] in ('Qubes', 'Qubes OS'):
         grains = {'virtual': 'Qubes', 'os': 'Fedora', 'os_family': 'RedHat'}
     return grains
