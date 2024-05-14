@@ -60,7 +60,9 @@ qubesctl saltutil.sync_all refresh=true -l quiet --out quiet > /dev/null || true
 /srv/salt/_utils/qubes_utils.py*
 
 %attr(750, root, root) %dir /srv/salt/_pillar
+/srv/salt/_pillar/qvm_features.py*
 /srv/salt/_pillar/qvm_prefs.py*
+/srv/salt/_pillar/qvm_tags.py*
 
 %changelog
 @CHANGELOG@
