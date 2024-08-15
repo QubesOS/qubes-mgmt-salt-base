@@ -15,7 +15,7 @@ Module Utilities
 from __future__ import absolute_import
 
 # Import python libs
-import pipes
+import shlex
 import types
 import argparse  # pylint: disable=E0598
 import logging
@@ -216,7 +216,7 @@ class ModuleBase(object):
 
         else:
             if isinstance(cmd, list):
-                cmd = ' '.join(pipes.quote(c) for c in cmd)
+                cmd = ' '.join(shlex.quote(c) for c in cmd)
 
             status = Status(
                 **__salt__['cmd.run_all'](
